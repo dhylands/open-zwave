@@ -36,6 +36,8 @@
 #include "platform/FileOps.h"
 #include "tinyxml.h"
 
+#include <stdio.h>
+
 using namespace OpenZWave;
 
 Options* Options::s_instance = NULL;
@@ -51,6 +53,7 @@ Options* Options::Create
 	string const& _commandLine
 )
 {
+  printf("Entering Options::Create\n");
 
 	if( s_instance == NULL )
 	{
@@ -67,33 +70,43 @@ Options* Options::Create
 			userPath += "/";
 		}
 
+    printf("Options::Create Check 1\n");
 		FileOps::Create();
+    printf("Options::Create Check 2\n");
 		if( !FileOps::FolderExists( configPath ) )
 		{
 			Log::Create( "", false, true, LogLevel_Debug, LogLevel_Debug, LogLevel_None );
 			/* Try some default directories */
+      printf("Options::Create Check 3\n");
 			if ( FileOps::FolderExists( "config/" ) )
 			{
+        printf("Options::Create Check 4\n");
 				Log::Write( LogLevel_Error, "Cannot find a path to the configuration files at %s, Using config/ instead...", configPath.c_str() );
 				configPath = "config/";
 			} else if (FileOps::FolderExists("/etc/openzwave/" ) )
 			{
+        printf("Options::Create Check 5\n");
 				Log::Write( LogLevel_Error, "Cannot find a path to the configuration files at %s, Using /etc/openzwave/ instead...", configPath.c_str() );
 				configPath = "/etc/openzwave/";
 #ifdef SYSCONFDIR
 			} else if ( FileOps::FolderExists(SYSCONFDIR ) )
 			{
+        printf("Options::Create Check 6\n");
 				Log::Write( LogLevel_Error, "Cannot find a path to the configuration files at %s, Using %s instead...", configPath.c_str(), SYSCONFDIR);
 				configPath = SYSCONFDIR;
 #endif
 			} else {
+        printf("Options::Create Check 7\n");
 				Log::Write( LogLevel_Error, "Cannot find a path to the configuration files at %s. Exiting...", configPath.c_str() );
 				OZW_FATAL_ERROR(OZWException::OZWEXCEPTION_CONFIG, "Cannot Find Configuration Files");
 				return NULL;
 			}
 		}
+    printf("Options::Create Check 8\n");
 		FileOps::Destroy();
+    printf("Options::Create Check 9\n");
 		s_instance = new Options( configPath, userPath, _commandLine );
+    printf("Options::Create Check 10\n");
 
 		// Add the default options
 		s_instance->AddOptionString(	"ConfigPath",				configPath,	false );	// Path to the OpenZWave config folder.
@@ -133,6 +146,7 @@ Options* Options::Create
 #if defined WINRT
 		s_instance->AddOptionInt(       "ThreadTerminateTimeout",   -1);						// Since threads cannot be terminated in WinRT, Thread::Terminate will simply wait for them to exit on there own
 #endif
+    printf("Leaving Options::Create\n");
 	}
 
 	return s_instance;
